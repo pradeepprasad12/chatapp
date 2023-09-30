@@ -1,0 +1,72 @@
+{% extends 'chat/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}chatapp{% endblock %}
+
+{% block content %}
+    <h2>Chat with {{ recipient.username }}</h2>
+
+    <div class="chat-container">
+      <div class="chat-messages">
+        <ul id="chat-messages-list">
+          {% for message in formatted_messages %}
+          <li>{{ message }}</li>
+          {% endfor %}
+            </ul>
+      </div>
+      <div class="chat-input">
+        <input type="text" id="message-input" placeholder="Type your message..." required>
+        <button id="send-button">Send</button>
+      </div>
+    </div>
+  
+    <p><a href="{% url 'home' %}">Back to Home</a></p>
+  
+    <script>
+      const chatSocket = new WebSocket(`ws://${window.location.host}/ws/chat/{{ recipient.id }}/{{sender.id}}/`);
+      const chatMessagesList = document.getElementById('chat-messages-list');
+      const messageInput = document.getElementById('message-input');
+      const sendButton = document.getElementById('send-button');
+
+      chatSocket.onopen = (event) => {
+        console.log('WebSocket connection opened:', event);
+    };
+    
+    chatSocket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        console.log(data)
+        addMessage(data.username, data.message,data.receivername);
+    };
+    
+    chatSocket.onclose = (event) => {
+        console.log('WebSocket connection closed:', event);
+    };
+    
+    chatSocket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+    };
+    
+    function addMessage(sender, message,receiver) {
+        const messageItem = document.createElement('li');
+        messageItem.innerText = `${sender}-- ${message}`;
+        chatMessagesList.appendChild(messageItem);
+    }
+    
+    sendButton.addEventListener('click', () => {
+        const message = messageInput.value;
+
+        if (message.trim() !== '') {
+            chatSocket.send(JSON.stringify({
+                'message': message,
+                'username': "{{sender.username}}",
+                'receivername':"{{recipient.username}}",
+
+            }));
+            messageInput.value = '';
+      //      addMessage('You', message);
+        }
+    });
+        
+    
+  </script>
+{% endblock %}

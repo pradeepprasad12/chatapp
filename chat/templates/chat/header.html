@@ -1,0 +1,32 @@
+
+<nav class="navbar navbar-dark bg-warning">
+    <!-- Navbar content -->
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="{% url 'home' %}">Next Growth</a>
+        </div>
+        <ul class="nav navbar-nav">
+        {% if user.is_authenticated %}
+            <li><a href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+            <li><a href="{% url 'login' %}">Login</a></li>
+            <li><a href="{% url 'signup' %}">Signup</a></li>
+        </ul>
+        </div>
+        {% endif %}
+</nav>
+    <div class="sidebar">
+            <a class="active" href="{% url 'home' %}">Home</a>
+            {% if user.is_authenticated %}
+                {% comment %} {% if user.is_staff %}
+                <a href="{% url 'add_android_app' %}">Add App</a>
+                {% else %}
+                <a href="{% url 'user_app_screenshot' %}">Upload Screenshot</a>
+                {% endif %} {% endcomment %}
+            {% else %}
+            <h5> &nbsp; &nbsp; Please login/signin....</h5>
+        {% endif %}
+    </div>
+      
+      
+      
